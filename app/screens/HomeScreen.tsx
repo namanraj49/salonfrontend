@@ -16,6 +16,15 @@ import Icon from "react-native-vector-icons/Ionicons";
 import axios from "axios";
 
 const API_URL = "https://jsonplaceholder.typicode.com/users";
+
+const services = [
+    { id: 1, name: "Haircut", icon: "cut" },
+    { id: 2, name: "Beard", icon: "man" },
+    { id: 3, name: "Massage", icon: "body" },
+    { id: 4, name: "Shampoo", icon: "water" },
+    { id: 5, name: "Others", icon: "ellipsis-horizontal" },
+  ];
+
 type HomeScreenNavigationProp = NativeStackNavigationProp<any>;
 
 const HomeScreen = ({ navigation }:{navigation:HomeScreenNavigationProp}) => {
@@ -24,6 +33,7 @@ const HomeScreen = ({ navigation }:{navigation:HomeScreenNavigationProp}) => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [allSalons, setAllSalons] = useState<Salon[]>([]);
+  const [selectedService,setSelectedService] = useState<string | null>("");
 
   useEffect(() => {
     fetchSalons();
@@ -89,6 +99,27 @@ const HomeScreen = ({ navigation }:{navigation:HomeScreenNavigationProp}) => {
         <ActivityIndicator size="large" color="blue" />
       ) : (
         <ScrollView>
+            {/*cards for services */}
+             <Text style={styles.sectionTitle}>Services</Text>
+             <FlatList 
+             data={services}
+             horizontal
+             showsHorizontalScrollIndicator={false}
+             keyExtractor={(item) => item.id.toString()}
+             renderItem={({item})=>(
+                <TouchableOpacity
+                style={[
+                    styles.serviceCard,
+                    selectedService === item.name && styles.serviceCardSelected,
+                ]}
+                onPress={() => setSelectedService(item.name)}
+                >
+                    <Icon name={item.icon} size={24} color="#555"/>
+                    <Text style={styles.serviceText}>{item.name}</Text>
+                </TouchableOpacity>
+             )}
+             />
+
           {/* Horizontal Sliding Cards for Top Salons */}
           <Text style={styles.sectionTitle}>Top Salons</Text>
           <FlatList
@@ -140,9 +171,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
-  searchIcon: { marginRight: 10 },
-  searchInput: { flex: 1, height: 40 },
-  sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 10 },
+  serviceCard: {
+    backgroundColor: "#f9f9f9",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    marginRight: 10,
+    width: 90,
+  },
+  serviceCardSelected: {
+    backgroundColor: "#add8e6",
+  },
+  serviceText: { marginTop: 5, fontSize: 14 },
   salonCardHorizontal: {
     width: 140,
     backgroundColor: "#f9f9f9",
@@ -151,6 +191,9 @@ const styles = StyleSheet.create({
     marginRight: 10,
     alignItems: "center",
   },
+  searchIcon: { marginRight: 10 },
+  searchInput: { flex: 1, height: 40 },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 10 },
   salonImage: { width: 80, height: 80, borderRadius: 40, marginBottom: 5 },
   salonCard: {
     padding: 16,
