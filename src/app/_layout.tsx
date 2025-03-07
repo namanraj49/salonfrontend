@@ -1,20 +1,33 @@
 import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
-  const [isLogin, setIsLogin] = useState(false); // Update based on login logic
+  //here i have to make the changes on the basis of the toggle
+  const [isLogin, setIsLogin] = useState(true);
 
   useEffect(() => {
-    SplashScreen.hideAsync();
+    const checkLoginStatus = async () => {
+      const loggedIn = await AsyncStorage.getItem('isLoggedIn');
+      setIsLogin(loggedIn === 'true'); // ✅ Convert string to boolean
+      await SplashScreen.hideAsync();
+    };
+
+    checkLoginStatus();
   }, []);
+
+  if (isLogin === null) return null; // Avoid flickering
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(main)" options={{ headerShown: false }} />
+      {!isLogin ? (
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      ) : (
+        <Stack.Screen name="(main)" options={{ headerShown: false }} />
+      )}
     </Stack>
   );
 };

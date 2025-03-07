@@ -16,22 +16,22 @@ export default function RegisterUser() {
       Alert.alert("Error", "All fields are required.");
       return;
     }
-
+  
     try {
-      const response = await axios.post("http://localhost:3000/users/register", {
+      const response = await axios.post("http://172.20.10.3:3000/users/register", {
         name,
         email,
         phone,
         password,
       });
-
+  
       Alert.alert("Success", "Registered successfully!");
-      // ✅ Use router.push instead of navigation.navigate
-      router.push("/(auth)/loginuser");  
+      router.push("/(auth)/loginuser");
     } catch (error) {
-      Alert.alert( "Registration failed.");
+      Alert.alert("Registration failed.");
     }
   };
+  
 
   return (
     <View style={styles.container}>
