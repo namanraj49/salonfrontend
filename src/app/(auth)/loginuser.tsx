@@ -13,11 +13,12 @@ export default function LoginUser() {
   const handleLogin = async () => {
     try {
       const response = await axios.post("http://172.20.10.3:3000/users/login", { email, password });
-      const { token } = response.data;
+      const { token,role } = response.data;
       
       if (token) {
         await AsyncStorage.setItem("authToken", token);  // ✅ Correct AsyncStorage usage
         await AsyncStorage.setItem("isLoggedIn", "true");
+        await AsyncStorage.setItem("role", role);
         Alert.alert("Success", "Logged in successfully!");
         router.push("/(auth)/Home");
       }

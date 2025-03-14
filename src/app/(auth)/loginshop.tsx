@@ -23,12 +23,13 @@ export default function ShopLogin() {
         password,
       });
 
-      const { token } = response.data;
+      const { token,role } = response.data;
      // console.log("Login Successful:", response.data);
 
       if (token) {
         await AsyncStorage.setItem("shopAuthToken", token); // ✅ Store token for shop login
         await AsyncStorage.setItem("isLoggedIn", "true");
+        await AsyncStorage.setItem("role", role);
         Alert.alert("Success", "Login successful!");
         router.push("/(auth)/Home"); // ✅ Redirect to auth home
       }
