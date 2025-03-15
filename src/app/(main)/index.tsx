@@ -1,10 +1,10 @@
-import { View, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { NavigationContainer } from "@react-navigation/native";
+import Layout from "./_layout"; // Import Layout
 
-export default function HomeScreen() {
+export default function App() {
   return (
-    <SafeAreaView>
-      <Text>Home Screen</Text>
-    </SafeAreaView>
+    <NavigationContainer>
+      <Layout />
+    </NavigationContainer>
   );
 }
