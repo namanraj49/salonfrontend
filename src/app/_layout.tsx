@@ -12,7 +12,7 @@ const RootLayout = () => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       const loggedIn = 'true';  // Hardcode login as true
-      const userRole = 'mian';  // Hardcode role as 'user'
+      const userRole = 'shop';  // Hardcode role as 'user'
       setIsLogin(loggedIn === 'true');
       setRole(userRole);  // This should work now as role is set to a valid string type
       await SplashScreen.hideAsync();

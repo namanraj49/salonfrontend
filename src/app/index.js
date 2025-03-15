@@ -9,7 +9,7 @@ export default function Index() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       const loggedIn = 'true';  // Hardcode login as true
-      const userRole = 'main';  // Hardcode role as 'user'
+      const userRole = 'shop';  // Hardcode role as 'user'
       setIsLogin(loggedIn === 'true');
       setRole(userRole);
     };
