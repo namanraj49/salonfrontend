@@ -20,7 +20,7 @@ export default function LoginUser() {
         await AsyncStorage.setItem("isLoggedIn", "true");
         await AsyncStorage.setItem("role", role);
         Alert.alert("Success", "Logged in successfully!");
-        router.push("/(auth)/Home");
+        router.replace("/(main)/profile")
       }
     } catch (error) {
       console.error("Login Error:"); // ✅ Log error details

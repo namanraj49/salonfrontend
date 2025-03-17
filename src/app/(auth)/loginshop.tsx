@@ -31,7 +31,7 @@ export default function ShopLogin() {
         await AsyncStorage.setItem("isLoggedIn", "true");
         await AsyncStorage.setItem("role", role);
         Alert.alert("Success", "Login successful!");
-        router.push("/(auth)/Home"); // ✅ Redirect to auth home
+        router.replace("/(shop)/profile"); // ✅ Redirect to auth home
       }
     } catch (error) {
       console.error("Login Failed:", error);
