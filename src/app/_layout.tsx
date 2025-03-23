@@ -1,41 +1,55 @@
-import { useEffect, useState } from 'react';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from "react";
+import { Stack } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from "expo-splash-screen";
+import { View, ActivityIndicator, Text } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
-  const [isLogin, setIsLogin] = useState(true);  // Start as true (logged in)
-  const [role, setRole] = useState<string | null>(null);  // Define role type as string or null
+  const [isLogin, setIsLogin] = useState(null);
+  const [role, setRole] = useState(null);
+  const [appReady, setAppReady] = useState(false);
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      const loggedIn = 'true';  // Hardcode login as true
-      const userRole = 'mian';  // Hardcode role as 'user'
-      setIsLogin(loggedIn === 'true');
-      setRole(userRole);  // This should work now as role is set to a valid string type
-      await SplashScreen.hideAsync();
-    };
+    (async () => {
+      try {
+        console.log("Checking login status...");
+        const loggedIn = await AsyncStorage.getItem("isLoggedIn");
+        const userRole = await AsyncStorage.getItem("role");
+        const userId = await AsyncStorage.getItem("userId");  // ✅ Fetch userId
+        const shopId = await AsyncStorage.getItem("shopId");  // ✅ Fetch shopId
 
-    checkLoginStatus();
+        console.log("Login Status:", loggedIn, "Role:", userRole, "User ID:", userId, "Shop ID:", shopId);
+        setIsLogin(loggedIn === "true");
+        setRole(userRole);
+      } catch (error) {
+        console.error("Error fetching login status:", error);
+      } finally {
+        setAppReady(true);
+        await SplashScreen.hideAsync();
+      }
+    })();
   }, []);
 
-  if (isLogin === null || role === null) return null;  // Avoid flickering
+  if (!appReady) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {/* If the user is logged in */}
       {isLogin ? (
-        // Show Shop Interface if Role is 'shop'
         role === "shop" ? (
           <Stack.Screen name="(shop)" options={{ headerShown: false }} />
         ) : (
-          // Show User Interface (Main) if Role is 'user'
           <Stack.Screen name="(main)" options={{ headerShown: false }} />
         )
       ) : (
-        // Show Auth Screen if Not Logged In
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       )}
     </Stack>

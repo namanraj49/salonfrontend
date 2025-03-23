@@ -1,19 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ActivityIndicator, StyleSheet } from 'react-native';
+import { 
+  View, Text, Image, ActivityIndicator, StyleSheet, TouchableOpacity 
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 import { getShopProfile } from '../../utils/shopService.js';
 
-// ✅ Use require() for local fallback image in React Native
 const defaultImage = require('../../assets/images/temp.png');
 
 const ProfileScreen = () => {
   const [shop, setShop] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchShopDetails = async () => {
       try {
-        const data = await getShopProfile();
+        const shopId = await AsyncStorage.getItem("shopId"); 
+      
+        if (!shopId) {
+          console.error("No shopId found in AsyncStorage");
+          setLoading(false);
+          return;
+        }
         
+        
+        const data = await getShopProfile(shopId); // ✅ Pass shopId to API
         setShop(data);
       } catch (error) {
         console.error("Failed to fetch shop details:", error);
@@ -21,9 +33,25 @@ const ProfileScreen = () => {
         setLoading(false);
       }
     };
-
+  
     fetchShopDetails();
   }, []);
+  
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("isLoggedIn");
+      await AsyncStorage.removeItem("role");
+      await AsyncStorage.removeItem("authToken"); // Remove user token
+      await AsyncStorage.removeItem("shopAuthToken"); // Remove shop token if exists
+
+      Alert.alert("Logout", "You have been logged out successfully!");
+      router.replace("/(auth)"); // Redirect to login screen
+    } catch (error) {
+      console.error("Logout Error:", error);
+      Alert.alert("Error", "Failed to log out. Try again.");
+    }
+  };
 
   if (loading) {
     return (
@@ -38,7 +66,6 @@ const ProfileScreen = () => {
     <View style={styles.container}>
       {shop ? (
         <>
-          {/* ✅ Display image only if valid, otherwise fallback */}
           <Image
             source={shop?.shopImage && shop?.shopImage.startsWith('http')
               ? { uri: shop.shopImage }
@@ -64,6 +91,11 @@ const ProfileScreen = () => {
             <Text style={styles.label}>✉️ Email:</Text>
             <Text style={styles.infoText}>{shop?.email || "N/A"}</Text>
           </View>
+
+          {/* ✅ Logout Button */}
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
         </>
       ) : (
         <Text style={styles.errorText}>No shop data available</Text>
@@ -132,6 +164,24 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     color: "red",
+  },
+  logoutButton: {
+    marginTop: 20,
+    backgroundColor: "#FF3B30",
+    padding: 12,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
+  },
+  logoutText: {
+    color: "#FFF",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 

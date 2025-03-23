@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router"; 
+import { useNavigation } from "@react-navigation/native";
 
 const user = {
   name: "John Doe",
@@ -12,7 +15,9 @@ const user = {
 };
 
 export default function ProfileScreen() {
+   const router = useRouter(); 
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const navigation = useNavigation(); // 🔹 Added navigation hook
 
   // Function to pick an image
   const pickImage = async () => {
@@ -25,6 +30,17 @@ export default function ProfileScreen() {
 
     if (!result.canceled) {
       setProfilePic(result.assets[0].uri);
+    }
+  };
+
+  // 🔹 Fixed Logout Functionrr
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("isLoggedIn");
+      await AsyncStorage.removeItem("role");
+      router.replace("/(auth)/Home"); // Navigate to Login screen after logout
+    } catch (error) {
+      console.error("Error logging out:", error);
     }
   };
 
@@ -58,7 +74,7 @@ export default function ProfileScreen() {
       />
 
       {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutButton}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </View>
