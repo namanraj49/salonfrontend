@@ -30,7 +30,7 @@ export default function ShopLogin() {
         await AsyncStorage.setItem("shopId", shopId);  // ✅ Store shopId
 
         Alert.alert("Success", "Login successful!");
-        router.replace("/(shop)/profile");  
+        router.replace("/(shop)/setting");  
       }
     } catch (error) {
       console.error("Login Failed:", error);

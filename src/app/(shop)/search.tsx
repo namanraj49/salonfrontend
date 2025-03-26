@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { 
+  View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, 
+  Keyboard, TouchableWithoutFeedback 
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';  // Import navigation hook
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://172.20.10.3:3000/addService'; // Your backend API endpoint
+const API_URL = 'http://172.20.10.3:3000/users/addService'; // Your backend API endpoint
 
 const AddServiceScreen = () => {
   const [name, setName] = useState('');
@@ -11,8 +15,12 @@ const AddServiceScreen = () => {
   const [price, setPrice] = useState('');
   const [duration, setDuration] = useState('');
 
+  const navigation = useNavigation(); // Get navigation instance
+
   const handleAddService = async () => {
     try {
+      Keyboard.dismiss(); // Hide keyboard when submitting
+
       const barberId = await AsyncStorage.getItem("shopId"); // Get shopId
 
       if (!barberId) {
@@ -30,7 +38,9 @@ const AddServiceScreen = () => {
 
       const response = await axios.post(API_URL, serviceData);
 
-      Alert.alert("Success", "Service added successfully!");
+      Alert.alert("Success", "Service added successfully!", [
+        { text: "OK", onPress: () => navigation.goBack() } // Navigate back
+      ]);
 
       setName('');
       setDescription('');
@@ -43,48 +53,54 @@ const AddServiceScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Add New Service</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <Text style={styles.heading}>Add New Service</Text>
 
-      <TextInput
-  style={styles.input}
-  placeholder="Enter service name "
-  placeholderTextColor="#333"  // Darker text color for better visibility
-  value={name}
-  onChangeText={setName}
-/>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter service name"
+          placeholderTextColor="#333"
+          value={name}
+          onChangeText={setName}
+        />
 
-<TextInput
-  style={styles.input}
-  placeholder="Enter description "
-  placeholderTextColor="#333"
-  value={description}
-  onChangeText={setDescription}
-/>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter description"
+          placeholderTextColor="#333"
+          value={description}
+          onChangeText={setDescription}
+        />
 
-<TextInput
-  style={styles.input}
-  placeholder="Enter price "
-  placeholderTextColor="#333"
-  value={price}
-  keyboardType="numeric"
-  onChangeText={setPrice}
-/>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter price"
+          placeholderTextColor="#333"
+          value={price}
+          keyboardType="numeric"
+          onChangeText={setPrice}
+        />
 
-<TextInput
-  style={styles.input}
-  placeholder="Enter duration in minutes "
-  placeholderTextColor="#333"
-  value={duration}
-  keyboardType="numeric"
-  onChangeText={setDuration}
-/>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter duration in minutes"
+          placeholderTextColor="#333"
+          value={duration}
+          keyboardType="numeric"
+          onChangeText={setDuration}
+        />
 
+        <TouchableOpacity style={styles.button} onPress={handleAddService}>
+          <Text style={styles.buttonText}>Add Service</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleAddService}>
-        <Text style={styles.buttonText}>Add Service</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Back Button (if needed) */}
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.backButtonText}>Back</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -121,6 +137,19 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#FFF",
     fontSize: 16,
+    fontWeight: "bold",
+  },
+  backButton: {
+    marginTop: 10,
+    backgroundColor: "#AAA",
+    padding: 10,
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
+  },
+  backButtonText: {
+    color: "#FFF",
+    fontSize: 14,
     fontWeight: "bold",
   },
 });
