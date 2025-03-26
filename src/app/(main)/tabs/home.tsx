@@ -28,17 +28,27 @@ const services = [
     { id: "3", name: "Massage", image: "https://example.com/massage.jpg" },
 ];
 
+type Salon = {
+    shop: any;
+    _id: string;
+   // id: string;
+    name: string;
+    address: string;
+    image: string;
+    // Add any other fields returned from your backend
+  };
+  
 const HomeScreen = () => {
     const navigation = useNavigation<HomeScreenNavigationProp>();
     const [searchQuery, setSearchQuery] = useState("");
-    const [salons, setSalons] = useState([]);
+    const [salons, setSalons] = useState<Salon[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Fetch salons from backend
     useEffect(() => {
         const fetchSalons = async () => {
             try {
-                const response = await fetch("http://172.20.10.3:3000/users/getAllSalons");
+                const response = await fetch("http://localhost:3000/users/getAllSalons");
                 
                 if (!response.ok) {
                     throw new Error(`HTTP Error! Status: ${response.status}`);
@@ -115,7 +125,18 @@ const HomeScreen = () => {
                                     location: item.shop.address,
                                     rating: 4.5, 
                                 }}
-                                onPress={() => navigation.navigate("SalonDetail", { salon: item })}
+                                onPress={() => navigation.navigate("SalonDetail", {
+                                    salon: {
+                                        id: item._id, 
+                                        name: item.shop.shopName,
+                                        image: item.shop.shopImage && item.shop.shopImage.startsWith("http") 
+                                            ? { uri: item.shop.shopImage } 
+                                            : defaultSalonImage, 
+                                        location: item.shop.address,
+                                        rating: 4.5, 
+                                    }
+                                })}
+                                
                             />
                         );
                     }}
